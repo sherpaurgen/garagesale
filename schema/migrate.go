@@ -6,7 +6,7 @@ import (
 	_ "github.com/jmoiron/sqlx"
 )
 
-//migration contain query needed to create table
+// migration contain query needed to create table
 // Never remove entries from migration SLICE once they have been run in production
 var migrations = []darwin.Migration{
 	{
