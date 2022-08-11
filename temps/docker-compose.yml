@@ -1,0 +1,15 @@
+version: '3.1'
+services:
+  db:
+    image: postgres:14.4
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes: 
+      - db:/Users/ush/GolandProjects/garagesale/temps/dba
+volumes:
+  db:
+    driver: local
