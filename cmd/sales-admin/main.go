@@ -8,14 +8,15 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"github.com/sherpaurgen/garagesale/schema"
+	"github.com/sherpaurgen/garagesale/internal/platform/database"
+	"github.com/sherpaurgen/garagesale/internal/schema"
 )
 
 type ProductService struct {
 	db *sqlx.DB
 }
 
-func openDb() (*sqlx.DB, error) {
+func OpenDb() (*sqlx.DB, error) {
 	q := url.Values{}
 	q.Set("sslmode", "disable")
 	q.Set("timezone", "utc")
@@ -33,7 +34,7 @@ func openDb() (*sqlx.DB, error) {
 
 func main() {
 	//connection initialization
-	db, err := openDb()
+	db, err := database.OpenDb()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -54,6 +55,8 @@ func main() {
 		}
 		log.Println("Seed applied")
 		return
+	default:
+		log.Println("Incorrect or empty flag-use migrate and seed only")
 	}
 
 }

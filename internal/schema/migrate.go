@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"log"
+
 	"github.com/GuiaBolso/darwin"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/jmoiron/sqlx"
@@ -28,5 +30,6 @@ var migrations = []darwin.Migration{
 func Migrate(db *sqlx.DB) error {
 	driver := darwin.NewGenericDriver(db.DB, darwin.PostgresDialect{})
 	d := darwin.New(driver, migrations, nil)
+	log.Print("Migration..")
 	return d.Migrate()
 }

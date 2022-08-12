@@ -5,14 +5,13 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
+	"github.com/sherpaurgen/garagesale/internal/platform/database"
 )
 
 type Product struct {
@@ -24,29 +23,13 @@ type Product struct {
 	DateUpdated time.Time `db:"date_updated" json:"date_updated"`
 }
 
-func openDb() (*sqlx.DB, error) {
-	q := url.Values{}
-	q.Set("sslmode", "disable")
-	q.Set("timezone", "utc")
-
-	u := url.URL{
-		Scheme:   "postgres",
-		User:     url.UserPassword("postgres", "postgres"),
-		Host:     "localhost",
-		Path:     "postgres",
-		RawQuery: q.Encode(),
-	}
-	return sqlx.Open("postgres", u.String())
-	//returns an   *sqlx.DB.
-}
-
 type ProductService struct {
 	db *sqlx.DB
 }
 
 func main() {
 	//connection initialization
-	db, err := openDb()
+	db, err := database.OpenDb()
 	if err != nil {
 		log.Fatal(err)
 	}
