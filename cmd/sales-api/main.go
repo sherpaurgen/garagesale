@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -10,22 +9,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/sherpaurgen/garagesale/cmd/sales-api/internal/handlers"
 	"github.com/sherpaurgen/garagesale/internal/platform/database"
 )
-
-type Product struct {
-	ID          string    `db:"product_id" json:"id"`
-	Name        string    `db:"name" json:"name"`
-	Cost        int       `db:"cost" json:"cost"`
-	Quantity    int       `db:"quantity" json:"quantity"`
-	DateCreated time.Time `db:"date_created" json:"date_created"`
-	DateUpdated time.Time `db:"date_updated" json:"date_updated"`
-}
-
-type ProductService struct {
-	db *sqlx.DB
-}
 
 func main() {
 	//connection initialization
@@ -35,7 +21,7 @@ func main() {
 	}
 	defer db.Close()
 
-	ps := ProductService{db: db}
+	ps := handlers.ProductService{DB: db}
 
 	api := &http.Server{
 		Addr:           ":8080",
@@ -77,27 +63,4 @@ func main() {
 
 	} //
 
-}
-
-func (p *ProductService) List(w http.ResponseWriter, req *http.Request) {
-	list := []Product{} //initialize empty list other wise it will return nil which is fine but difficult for frontend to parse json, doing this will return empty list []
-	const q = `SELECT * FROM products`
-	err := p.db.Select(&list, q)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Println("Error querying db:", err)
-		return
-	}
-
-	data, err := json.Marshal(list)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Println("Marshalling error:", err)
-		return
-	}
-	w.Header().Set("content-type", "application/json; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
-	if _, err := w.Write(data); err != nil {
-		log.Print("error writing ", err)
-	}
 }
