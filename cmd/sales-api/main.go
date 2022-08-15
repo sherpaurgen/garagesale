@@ -32,6 +32,7 @@ func run() error {
 	defer db.Close()
 	log := log.New(os.Stdout, "SalesAPI:", log.LstdFlags)
 	//logging based on method signature eg. salesapi
+	// Goal is to pass logger to the things that need it here it ispassed to handler as struct
 
 	ps := handlers.ProductService{DB: db, Log: log}
 
