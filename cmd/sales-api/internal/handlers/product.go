@@ -45,3 +45,28 @@ func (p *ProductService) List(w http.ResponseWriter, req *http.Request) {
 		p.Log.Println("Error writing to responsebody ", err)
 	}
 }
+
+func (p *ProductService) GetProduct(w http.ResponseWriter, req *http.Request) {
+	id := "todo"
+	const q = `SELECT product_id,name,cost,quantity,date_updated,date_created FROM products where product_id= $1`
+	var prod Product //initialize a single Product
+	err := p.DB.Select(&prod, q, id)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		p.Log.Println("Error querying db:", err)
+		return
+	}
+
+	data, err := json.Marshal(prod)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		p.Log.Println("Marshalling error:", err)
+		return
+	}
+	w.Header().Set("content-type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	if _, err := w.Write(data); err != nil {
+		p.Log.Println("Error writing to responsebody ", err)
+	}
+}
