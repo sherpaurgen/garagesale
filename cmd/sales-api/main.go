@@ -10,24 +10,27 @@ import (
 	"time"
 
 	"github.com/sherpaurgen/garagesale/cmd/sales-api/internal/handlers"
+	"github.com/sherpaurgen/garagesale/internal/platform/conf"
 	"github.com/sherpaurgen/garagesale/internal/platform/database"
 )
 
 func main() {
+
 	//connection initialization
-	db, err := database.OpenDb()
+	db, err := database.OpenDb(conf.GetDbConfig())
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
 	ps := handlers.ProductService{DB: db}
-
+	var webconf conf.Webconfig
+	webconf = conf.GetWebConfig()
 	api := &http.Server{
-		Addr:           ":8080",
+		Addr:           webconf.Addr,
 		Handler:        http.HandlerFunc(ps.List),
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
+		ReadTimeout:    time.Duration(webconf.ReadTimeout) * time.Second,
+		WriteTimeout:   time.Duration(webconf.WriteTimeout) * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 
