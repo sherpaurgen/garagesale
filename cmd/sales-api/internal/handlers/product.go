@@ -41,6 +41,6 @@ func (p *ProductService) List(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("content-type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	if _, err := w.Write(data); err != nil {
-		log.Print("error writing ", err)
+		log.Println("Error writing to responsebody ", err)
 	}
 }

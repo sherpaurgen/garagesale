@@ -9,17 +9,25 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/sherpaurgen/garagesale/cmd/sales-api/internal/handlers"
 	"github.com/sherpaurgen/garagesale/internal/platform/conf"
 	"github.com/sherpaurgen/garagesale/internal/platform/database"
 )
 
 func main() {
+	err := run()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func run() error {
 
 	//connection initialization
 	db, err := database.OpenDb(conf.GetDbConfig())
 	if err != nil {
-		log.Fatal(err)
+		return errors.Wrap(err, "DB connection issue")
 	}
 	defer db.Close()
 
@@ -45,7 +53,8 @@ func main() {
 	//above is not blocking operation although waiting on shutdown channel
 	select {
 	case err := <-serverErrors:
-		log.Fatalf("Error while listening and starting http server: %v", err)
+		//log.Fatalf("Error while listening and starting http server: %v", err)
+		return errors.Wrap(err, "Issue listening and starting http server")
 
 	case <-shutdown:
 		log.Println("main: Starting shutdown")
@@ -61,9 +70,10 @@ func main() {
 			//Close() immediately closes all active net.Listeners and any connections in state StateNew, StateActive, or StateIdle. For a graceful shutdown, use Shutdown.
 		}
 		if err != nil {
-			log.Fatalf("main: could not stop server gracefully Error: %v", err)
+			//log.Fatalf("main: could not stop server gracefully Error: %v", err)
+			return errors.Wrap(err, "Main could not stop server gracefully")
 		}
 
 	} //
-
+	return nil //since log fatal is taken care of
 }
