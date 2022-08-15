@@ -19,7 +19,8 @@ type Product struct {
 }
 
 type ProductService struct {
-	DB *sqlx.DB
+	DB  *sqlx.DB
+	Log *log.Logger
 }
 
 func (p *ProductService) List(w http.ResponseWriter, req *http.Request) {
@@ -28,19 +29,19 @@ func (p *ProductService) List(w http.ResponseWriter, req *http.Request) {
 	err := p.DB.Select(&list, q)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Println("Error querying db:", err)
+		p.Log.Println("Error querying db:", err)
 		return
 	}
 
 	data, err := json.Marshal(list)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Println("Marshalling error:", err)
+		p.Log.Println("Marshalling error:", err)
 		return
 	}
 	w.Header().Set("content-type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	if _, err := w.Write(data); err != nil {
-		log.Println("Error writing to responsebody ", err)
+		p.Log.Println("Error writing to responsebody ", err)
 	}
 }

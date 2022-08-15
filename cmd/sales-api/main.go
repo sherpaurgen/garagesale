@@ -30,8 +30,11 @@ func run() error {
 		return errors.Wrap(err, "DB connection issue")
 	}
 	defer db.Close()
+	log := log.New(os.Stdout, "SalesAPI:", log.LstdFlags)
+	//logging based on method signature eg. salesapi
 
-	ps := handlers.ProductService{DB: db}
+	ps := handlers.ProductService{DB: db, Log: log}
+
 	var webconf conf.Webconfig
 	webconf = conf.GetWebConfig()
 	api := &http.Server{
