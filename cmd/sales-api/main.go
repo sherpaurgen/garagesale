@@ -34,13 +34,14 @@ func run() error {
 	//logging based on method signature eg. salesapi
 	// Goal is to pass logger to the things that need it here it ispassed to handler as struct
 
-	ps := handlers.ProductService{DB: db, Log: log}
+	//ps := handlers.ProductService{DB: db, Log: log}
 
 	var webconf conf.Webconfig
 	webconf = conf.GetWebConfig()
 	api := &http.Server{
-		Addr:           webconf.Addr,
-		Handler:        http.HandlerFunc(ps.List),
+		Addr:    webconf.Addr,
+		Handler: handlers.API(log, db),
+		//Handler:        http.HandlerFunc(ps.List),
 		ReadTimeout:    time.Duration(webconf.ReadTimeout) * time.Second,
 		WriteTimeout:   time.Duration(webconf.WriteTimeout) * time.Second,
 		MaxHeaderBytes: 1 << 20,
